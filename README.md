@@ -15,7 +15,7 @@ TASKFLOW is a small full-stack task tracker: users authenticate with email and p
 | Auth       | **JWT** (Bearer) + **bcryptjs** for password hashes                                                           |
 | Logging    | **Pino**                                                                                                      |
 | Frontend   | **React 19**, **Vite 8**, **TanStack Query**, **Tailwind CSS 4**, **shadcn**-style UI stack, **React Router** |
-| Containers | **Docker Compose** (Postgres + API image)                                                                     |
+| Containers | **Docker Compose** (Postgres + API + static frontend behind nginx)                                            |
 
 
 ## Architecture Decisions
@@ -38,10 +38,11 @@ From the repository root:
 docker compose up --build
 ```
 
-- **API**: `http://localhost:3000` (override host port with `BACKEND_PORT`, e.g. `BACKEND_PORT=3001 docker compose up`).
+- **App (SPA)**: `http://localhost:5173` (override with `FRONTEND_PORT`, e.g. `FRONTEND_PORT=8080 docker compose up`). The container serves the built UI and proxies `/api/*` to the backend, so you do not need CORS for the browser.
+- **API**: `http://localhost:3000` (override with `BACKEND_PORT`, e.g. `BACKEND_PORT=3001 docker compose up`).
 - **Postgres**: `localhost:5432`, user `taskflow`, password `taskflow`, database `taskflow` (see `docker-compose.yml`).
 
-The **frontend is not** defined in Compose. For local UI development, run the Vite app from `frontend/` (`npm install` then `npm run dev`). It proxies `/api/*` to `http://localhost:3000` in dev, so keep the API on port 3000 or adjust `frontend/vite.config.ts`. For a fixed API origin, set `VITE_API_URL` (see `frontend/src/services/api.ts`).
+When the **frontend** container starts, it prints `== TASKFLOW ==` with the app and API URLs in the Compose logs. For local UI development without Docker, run the Vite app from `frontend/` (`npm install` then `npm run dev`). It proxies `/api/*` to `http://localhost:3000` in dev, so keep the API on port 3000 or adjust `frontend/vite.config.ts`. For a fixed API origin in a custom build, set `VITE_API_URL` (see `frontend/src/services/api.ts`).
 
 ### Backend without Docker
 

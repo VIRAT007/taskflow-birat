@@ -30,9 +30,24 @@ services:
       DATABASE_URL: postgresql://taskflow:taskflow@postgres:5432/taskflow?schema=public
       JWT_SECRET: ${JWT_SECRET:-dev-docker-change-me-16chars}
       RUN_SEED: ${RUN_SEED:-false}
+      TASKFLOW_API_PORT: ${BACKEND_PORT:-3000}
     depends_on:
       postgres:
         condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_SAME_ORIGIN_API: "true"
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+    environment:
+      TASKFLOW_FRONTEND_PORT: ${FRONTEND_PORT:-5173}
+      TASKFLOW_API_PORT: ${BACKEND_PORT:-3000}
+    depends_on:
+      - backend
 
 volumes:
   taskflow_pgdata:
