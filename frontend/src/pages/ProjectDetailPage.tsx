@@ -26,7 +26,7 @@ export function ProjectDetailPage() {
 
   if (!validId) {
     return (
-      <div className="container max-w-screen-2xl px-4 py-8">
+      <div key={projectId ?? 'invalid'} className="container max-w-screen-2xl px-4 py-8">
         <Link
           to="/projects"
           className={cn(
@@ -47,7 +47,7 @@ export function ProjectDetailPage() {
   }
 
   return (
-    <div className="container max-w-screen-2xl px-4 py-8">
+    <div key={projectId} className="container max-w-screen-2xl px-4 py-8">
       <Link
         to="/projects"
         className={cn(

@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 
 import { Button, buttonVariants } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
@@ -37,6 +37,12 @@ export function Navbar() {
           </NavLink>
         </nav>
         <div className="flex items-center gap-2">
+          <Link
+            to="/projects?create=1"
+            className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'no-underline')}
+          >
+            New project
+          </Link>
           <ThemeToggle />
           {user ? (
             <>

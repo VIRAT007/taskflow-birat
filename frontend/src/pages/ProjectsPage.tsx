@@ -1,6 +1,6 @@
 import { AlertCircleIcon, FolderKanbanIcon } from 'lucide-react'
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useCallback, useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -12,6 +12,8 @@ import { ApiError } from '@/services/http'
 import { cn } from '@/lib/utils'
 
 const PAGE_SIZE = 20
+/** Opens the create dialog when set to `1` (see `/projects/new` redirect in `App.tsx`). */
+const CREATE_PROJECT_QUERY = 'create'
 
 function ProjectListSkeleton() {
   return (
@@ -30,15 +32,35 @@ function ProjectListSkeleton() {
 }
 
 export function ProjectsPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [page, setPage] = useState(1)
-  const [createOpen, setCreateOpen] = useState(false)
+  const createOpen = searchParams.get(CREATE_PROJECT_QUERY) === '1'
+
+  const setCreateOpen = useCallback(
+    (open: boolean) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev)
+          if (open) {
+            next.set(CREATE_PROJECT_QUERY, '1')
+          } else {
+            next.delete(CREATE_PROJECT_QUERY)
+          }
+          return next
+        },
+        { replace: true },
+      )
+    },
+    [setSearchParams],
+  )
+
   const { data, isLoading, isError, error, isFetching } = useProjectsListQuery(page, PAGE_SIZE)
 
   const totalPages = data ? Math.max(1, Math.ceil(data.meta.total / data.meta.limit)) : 1
 
   return (
     <div className="container max-w-screen-2xl px-4 py-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="relative z-10 flex flex-col gap-4 bg-background sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Projects</h1>
           <p className="text-sm text-muted-foreground">Workspaces you own or collaborate on.</p>
@@ -48,9 +70,9 @@ export function ProjectsPage() {
         </Button>
       </div>
 
-      <CreateProjectDialog open={createOpen} onOpenChange={setCreateOpen} />
+      {createOpen ? <CreateProjectDialog open onOpenChange={setCreateOpen} /> : null}
 
-      <div className="mt-8">
+      <div className="mt-10">
         {isError && (
           <Alert variant="destructive">
             <AlertCircleIcon />

@@ -26,6 +26,7 @@ export default function App() {
           <Route element={<AppLayout />}>
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<HomePage />} />
+              <Route path="/projects/new" element={<Navigate to="/projects?create=1" replace />} />
               <Route path="/projects" element={<ProjectsPage />} />
               <Route path="/projects/:projectId" element={<ProjectDetailPage />} />
             </Route>
