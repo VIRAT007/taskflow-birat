@@ -10,6 +10,17 @@ export const errorMiddleware: ErrorRequestHandler = (err, req, res, next) => {
   const userId = req.user?.user_id;
   const log = req.log ?? logger.child({ requestId });
 
+  // express.json / body-parser: invalid JSON is a SyntaxError with status 400
+  const maybeJsonBodyErr = err as unknown as { statusCode?: number };
+  if (err instanceof SyntaxError && maybeJsonBodyErr.statusCode === 400) {
+    log.warn({ err: { name: err.name, message: err.message }, route, userId }, 'invalid_json_body');
+    res.status(400).json({
+      requestId,
+      error: { code: 'INVALID_JSON', message: 'Request body must be valid JSON' },
+    });
+    return;
+  }
+
   if (isHttpError(err) && err.statusCode >= 400 && err.statusCode < 500) {
     log.warn(
       {
