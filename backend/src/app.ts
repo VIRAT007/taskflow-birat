@@ -1,5 +1,6 @@
 import express, { Router } from 'express';
 
+import { corsMiddleware } from './middlewares/cors.middleware';
 import { authMiddleware } from './middlewares/auth.middleware';
 import { errorMiddleware } from './middlewares/error.middleware';
 import { notFoundMiddleware } from './middlewares/notFound.middleware';
@@ -20,6 +21,7 @@ export function createApp(): express.Application {
   const app = express();
 
   app.disable('x-powered-by');
+  app.use(corsMiddleware);
   app.use(requestContextMiddleware);
   app.use(requestLogMiddleware);
   app.use(express.json());
