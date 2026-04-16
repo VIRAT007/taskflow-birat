@@ -4,6 +4,14 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main(): Promise<void> {
+  const existing = await prisma.user.findUnique({
+    where: { email: 'test@example.com' },
+  });
+  if (existing) {
+    console.log('Seed skipped: test@example.com already exists.');
+    return;
+  }
+
   const passwordHash = await bcrypt.hash('password123', 12);
 
   await prisma.task.deleteMany();

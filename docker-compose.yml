@@ -29,7 +29,8 @@ services:
       LOG_LEVEL: ${LOG_LEVEL:-info}
       DATABASE_URL: postgresql://taskflow:taskflow@postgres:5432/taskflow?schema=public
       JWT_SECRET: ${JWT_SECRET:-dev-docker-change-me-16chars}
-      RUN_SEED: ${RUN_SEED:-false}
+      # Run `prisma db seed` after migrations (test@example.com + demo data). Set RUN_SEED=false to skip.
+      RUN_SEED: ${RUN_SEED:-true}
       TASKFLOW_API_PORT: ${BACKEND_PORT:-3000}
     depends_on:
       postgres:
